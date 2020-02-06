@@ -14,7 +14,7 @@ def quadratic_time(n):
         for j in range(n):
             s = s + 1
 
-complexity_graph(quadratic_time, range(1, 500, 20), reps=12, number=6)
+complexity_graph(quadratic_time, ns=range(1, 500, 20), reps=12, number=6)
 ```
 
 #### Output
