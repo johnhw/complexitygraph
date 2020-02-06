@@ -27,6 +27,28 @@ def complexity_fit(x, fn, ns, ts):
 def time_complexity(
     fn, ns, reps=20, number=1000, shuffle=True, setup="pass", extra_globals={}
 ):
+    """Time the runtime of a function, running it repeatedly using timeit and return the runtimes.
+
+    Parameters:
+        fn: function to run. Must take one argument `n`, which specifies the "size" of the probelm
+        ns: The values for n to use. Usually something like range(1, 1000, 100)
+        number: number of times to run each function inside the timeit loop
+        reps: number of repetitions of the entire timeit run to do. This is important to reduce
+            variance in the estimates
+        shuffle: If True, the order of ns is shuffled before each `rep`. This helps reduce
+            correlated variations in the results and can result in lower noise
+        setup: string, representing code to be executed at the start of each
+                invocation of the fn loop (i.e. once per `number` loops).
+                Defaults to "pass".
+        extra_globals: any extra variables to be available to fn or setup
+            during execution, as a dictionary.
+        
+    Returns:
+        ts: the times, as an (ns, reps) shape NumPy array, for each n in order.            
+            Times are normalised so that they are proportional
+            to the median of the value of the first n given.
+            i.e., median(ts[0,:])==1
+    """
     ts = []
     ns = np.array(ns)
     for rep in range(reps):
@@ -61,8 +83,17 @@ def time_complexity(
 
 
 def _fit_curves(ns, ts):
-    """Fit different curves to the times, and return a
-    dictionary of fits"""
+    """Fit different functional forms of curves to the times.
+
+    Parameters:
+        ns:     the value of n for each invocation
+        ts:     the measured run time, as a (len(ns), reps) shape array
+    Returns:
+        scores:  normalised scores for each function
+        coeffs:  coefficients for each function
+        names:   names of each function
+        fns:     the callable for each function in turn.
+    """
     # compute stats
     med_times = np.median(ts, axis=1)
     # fit and score complexities
@@ -89,7 +120,13 @@ def _fit_curves(ns, ts):
 
 
 def fit_curves(ns, ts):
-    """Return just the score dictionary for the curve fits"""
+    """Return just the score dictionary for the curve fits.
+    Parameters:
+        ns:     the value of n for each invocation
+        ts:     the measured run time, as a (len(ns), reps) shape array
+    Returns:
+        score_dict: Dictionary mapping complexity function names to their scores. Scores sum to 1.0
+    """
     (scores, coeffs, names, fns) = _fit_curves(ns, ts)
 
     ord_score = np.argsort(-scores)
@@ -100,7 +137,11 @@ def fit_curves(ns, ts):
 
 
 def score_report(score_dict):
-    """Print out a simple tabular report on the complexities"""
+    """Print out a simple tabular report on the complexities.
+    Parameters:
+        score_dict: A dictionary mapping complexity function names to scores, as
+                    returned by fit_curves(ns, ts).
+    """
 
     for name, score in score_dict.items():
         print(f"  {name.ljust(12)} {score*100.0:4.1f}%")
@@ -108,8 +149,14 @@ def score_report(score_dict):
 
 def plot_complexity(ns, ts, reference_curves=True):
     """Generate a plot of the time complexity, including 
-    reference curves"""
+    reference curves.
+    Parameters:
+        ns:     the value of n for each invocation
+        ts:     the measured run time, as a (len(ns), reps) shape array    
+    """
+    # fit the curves
     scores, coeffs, names, fns = _fit_curves(ns, ts)
+    # get median and IQR
     ord_times = np.percentile(ts, q=[25, 50, 75], axis=1)
 
     ns = np.array(ns)
@@ -123,6 +170,8 @@ def plot_complexity(ns, ts, reference_curves=True):
     ax.set_title("Linear scale complexity")
     ax.set_frame_on(False)
 
+    # show curves for the complexity functions, to 
+    # help visually indicate best match
     if reference_curves:
         for score, coeff, fn, name in zip(scores, coeffs, fns, names):
             ax.plot(
@@ -141,6 +190,24 @@ def plot_complexity(ns, ts, reference_curves=True):
 def complexity_graph(
     fn, ns, reps=20, number=1000, shuffle=True, setup="pass", extra_globals={}
 ):
+    """Wrapper to call time_complexity, then score_report and plot_complexity,
+    all in one go.
+
+    Parameters:
+        fn: function to run. Must take one argument `n`, which specifies the "size" of the probelm
+        ns: The values for n to use. Usually something like range(1, 1000, 100)
+        number: number of times to run each function inside the timeit loop
+        reps: number of repetitions of the entire timeit run to do. This is important to reduce
+            variance in the estimates
+        shuffle: If True, the order of ns is shuffled before each `rep`. This helps reduce
+            correlated variations in the results and can result in lower noise
+        setup: string, representing code to be executed at the start of each
+                invocation of the fn loop (i.e. once per `number` loops).
+                Defaults to "pass".
+        extra_globals: any extra variables to be available to fn or setup
+            during execution, as a dictionary.
+            
+    """
     ts = time_complexity(fn, ns, reps, number, shuffle, setup, extra_globals)
     score_dict = fit_curves(ns, ts)
     print()
