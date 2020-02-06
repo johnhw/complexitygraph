@@ -21,7 +21,7 @@ complexities = {
 
 
 def complexity_fit(x, fn, ns, ts):
-    return np.sum((x * fn(ns) - ts) ** 2)
+    return np.sum(np.exp((x * fn(ns) - ts) ** 2))
 
 
 def time_complexity(
@@ -158,6 +158,11 @@ if __name__ == "__main__":
         for i in range(n):
             for j in range(n):
                 s = s + 1
-
-    complexity_graph(quadratic_time, range(1, 500, 20), reps=12, number=6)
-    plt.show()
+    import math
+    def logn(n):
+        s = 0
+        for i in range(int(math.log(n))):
+            s = s + 1
+    #complexity_graph(quadratic_time, range(1, 500, 20), reps=12, number=6)
+    complexity_graph(logn, range(1, 50000, 1000), reps=12, number=6)
+    #plt.show()
