@@ -152,8 +152,7 @@ def complexity_graph(
 
 if __name__ == "__main__":
     import random
-
-    # test sorting sequences of random integers
+    
     def quadratic_time(n):
         s = 0
         for i in range(n):
