@@ -47,6 +47,13 @@ def test_complexities():
     complexity_should_be("exp", exp, range(1, 16))
     complexity_should_be("factorial", factorial, range(1, 8))
 
+    
+    from math import log
+    def logtime(n):
+        [1 for i in range(int(1000*log(n)))]
+    complexity_should_be("log", logtime, range(1, 2000, 100))
+    
+    
 
 def test_fit_curves():
     ns = range(10)

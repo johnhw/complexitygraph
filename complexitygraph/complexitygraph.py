@@ -21,7 +21,7 @@ complexities = {
 
 
 def complexity_fit(x, fn, ns, ts):
-    return np.sum(np.exp((x * fn(ns) - ts) ** 2))
+    return np.sum((x * fn(ns) - ts) ** 2)
 
 
 def time_complexity(
@@ -79,6 +79,7 @@ def time_complexity(
         ts.append(times)
     ts = np.array(ts).T
     ts = ts / np.median(ts[0])
+
     return ts
 
 
@@ -101,7 +102,7 @@ def _fit_curves(ns, ts):
     coeffs = []
     names = []
     fns = []
-    ns = np.array(ns)
+    ns = np.array(ns) 
     ts = np.array(med_times)
     for c_name, c_fn in complexities.items():
         res = scipy.optimize.minimize_scalar(
@@ -127,6 +128,7 @@ def fit_curves(ns, ts):
     Returns:
         score_dict: Dictionary mapping complexity function names to their scores. Scores sum to 1.0
     """
+    
     (scores, coeffs, names, fns) = _fit_curves(ns, ts)
 
     ord_score = np.argsort(-scores)
@@ -162,7 +164,7 @@ def plot_complexity(ns, ts, reference_curves=True):
     ns = np.array(ns)
     # plot complexity curve
     fig, ax = plt.subplots(1, 1, figsize=(9, 4))
-    ax.plot(ns, ord_times[1, :], "k--", zorder=10)
+    ax.plot(ns, ord_times[1, :], "k--", zorder=10, label="Runtime")
     ax.plot(ns, ord_times[1, :], "k.", zorder=11)
     ax.fill_between(ns, ord_times[0, :], ord_times[2, :], alpha=0.1)
     ax.set_xlabel("N")
@@ -206,7 +208,7 @@ def complexity_graph(
                 Defaults to "pass".
         extra_globals: any extra variables to be available to fn or setup
             during execution, as a dictionary.
-            
+
     """
     ts = time_complexity(fn, ns, reps, number, shuffle, setup, extra_globals)
     score_dict = fit_curves(ns, ts)
@@ -224,12 +226,6 @@ if __name__ == "__main__":
         s = 0
         for i in range(n):
             for j in range(n):
-                s = s + 1
-    import math
-    def logn(n):
-        s = 0
-        for i in range(int(math.log(n))):
-            s = s + 1
-    #complexity_graph(quadratic_time, range(1, 500, 20), reps=12, number=6)
-    complexity_graph(logn, range(1, 50000, 1000), reps=12, number=6)
-    #plt.show()
+                s = s + 1 
+    complexity_graph(quadratic_time, range(1, 500, 20), reps=12, number=6)    
+    plt.show()
