@@ -34,24 +34,31 @@ Scores for quadratic_time
 
 ## Documentation
 
-`def complexity_graph(fn, ns, reps=20, number=1000, shuffle=True, setup="pass", extra_globals={}):`
+`complexity_graph(fn, ns, reps=20, number=1000, shuffle=True, setup="pass", extra_globals={})`
 
-Calls `time_complexity` (to time the execution runs), then `score_report` (to fit each possible complexity curve) and `plot_complexity` (to plot the graph),
-    all in one go.
+This function calls `time_complexity` (to time the execution runs), then `score_report` (to fit each possible complexity curve) and `plot_complexity` (to plot the graph),
+    all in one go. 
     
 * Parameters:
-        * `fn`: function to run. This function must take one exactly one argument `n`, which specifies the "size" of the probelm
-        * `ns`: The values for n to use, as a sequence. Usually something like range(1, 1000, 100)
-        * `number`: number of times to run each function inside the timeit loop 
-        * `reps`: number of repetitions of the entire run to do. This is important to reduce
-            variance in the estimates
-        * `shuffle`: If True, the order of ns is shuffled before each `rep`. This helps reduce
-            correlated variations in the results and can result in lower noise
-        * `setup`: string, representing code to be executed at the start of each
-                invocation of the fn loop (i.e. once per `number` loops).
-                Defaults to "pass".
-        * `extra_globals`: any extra variables to be available to fn or setup  during execution, as a dictionary.
-        
+
+    * `fn`: function to run. This function must take one exactly one argument `n`, which specifies the "size" of the problem.
+
+    * `ns`: The values for n to use, as a sequence. Usually something like range(1, 1000, 100)
+
+    * `number`: number of times to run each function inside the timeit loop 
+
+    * `reps`: number of repetitions of the entire run to do. This is important to reduce        
+        variance in the estimates
+
+    * `shuffle`: If True, the order of ns is shuffled before each `rep`. This helps reduce
+        correlated variations in the results and can result in lower noise
+
+    * `setup`: string, representing code to be executed at the start of each
+            invocation of the fn loop (i.e. once per `number` loops).
+            Defaults to "pass".
+
+    * `extra_globals`: any extra variables to be available to fn or setup  during execution, as a dictionary.
+
 Note that `fn` will be run `number x len(ns) x reps` times to compute the result. For example, with `ns=[1, 2, 3]` and `number=3`, `reps=2`, the following calls would be made:
     
     # rep 1
